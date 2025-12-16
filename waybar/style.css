@@ -1,0 +1,84 @@
+@import url("./colors.css");
+
+* {
+    border: none;
+    border-radius: 10;
+    color: @foreground;
+    font-family: "SF Pro Display", "JetBrainsMono Nerd Font Propo";
+    font-size: 15px;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+}
+
+window#waybar {
+    background: transparent;
+    color: @foreground;
+    
+}
+
+tooltip {
+    background: @background;
+    color: @foreground;
+    border-radius: 10;
+}
+tooltip label {
+  color: @foreground;
+}
+
+#pulseaudio {
+    background: @background;
+    padding: 0 10px;
+}
+
+#workspaces {
+    transition: all 250ms ease-in-out;
+}
+
+#workspaces button {
+    transition: all 250ms ease-in-out;
+    padding: 0 10px;
+    border-radius: 10;
+    background: @background;
+    color: @foreground;
+    /* border: 2px solid @background; */
+}
+
+#workspaces button.active {
+    /* transition: all 200ms ease-in-out; */
+    background: @background;
+    padding: 0 20px;
+    border: 2px solid @purple
+    /* border-bottom: 3px solid white; */
+}
+
+#mode, #clock {
+    padding: 0 10px;
+    border-radius: 10;
+}
+
+#mode {
+    background: @background;
+    /* border-bottom: 3px solid white; */
+}
+
+#clock {
+    background-color: @background;
+    color: @foreground;
+}
+
+#window {
+    /* transition: all 250ms ease-in-out; */
+    padding: 0 10px;
+    border-radius: 10;
+    background: @background;
+    color: @foreground;
+}
+
+@keyframes blink {
+    to {
+        background-color: @background;
+        color: @foreground;
+    }
+}
+
