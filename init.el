@@ -9,46 +9,48 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes '(wombat))
- '(ispell-dictionary nil)
  '(package-selected-packages
-   '(scad-mode org-roam org-bullets org-contrib vterm lsp-treemacs helm-lsp company company-mode lsp-ui yaml-mode ## nix-mode doom-modeline nerd-icons smartparens flycheck auto-complete helm dired-sidebar which-key rainbow-delimiters rainbow-delimeters dracula-theme auto-dim-other-buffers cursor-flash ace-window gnu-elpa-keyring-update)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+   '(caser company direnv doom-modeline dracula-theme dts-mode
+           flycheck-hl-todo flyspell-popup helm-lsp helm-projectile
+           llama lsp-treemacs lsp-ui magit magit-todos nix-mode
+           ob-mermaid org-bullets org-roam plantuml-mode
+           rainbow-delimiters smartparens tree-sitter
+           tree-sitter-langs which-key with-editor yaml-mode yasnippet)))
+;; (custom-set-faces
+;;  ;; custom-set-faces was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  '(variable-pitch ((t (:family "Sans Serif")))))
 
-;; Initialize package sources
+
+
 (require 'package)
 
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ;; ("org" . "https://orgmode.org/elpa/")
-			 ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+			 ;; ("nongnu" . "https://elpa.nongnu.org/nongnu/")
                          ("elpa" . "https://elpa.gnu.org/packages/")))
 
+
+(use-package dracula-theme)
 (load-theme 'dracula t)
 
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
 
-  ;; Initialize use-package on non-Linux platforms
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-
 (require 'use-package)
 (setq use-package-always-ensure t)
 
-(use-package auto-package-update
-  :custom
-  (auto-package-update-interval 7)
-  (auto-package-update-prompt-before-update t)
-  (auto-package-update-hide-results t)
-  :config
-  (auto-package-update-maybe)
-  (auto-package-update-at-time "09:00"))
+;; (use-package auto-package-update
+;;   :custom
+;;   (auto-package-update-interval 7)
+;;   (auto-package-update-prompt-before-update t)
+;;   (auto-package-update-hide-results t)
+;;   :config
+;;   (auto-package-update-maybe)
+;;   (auto-package-update-at-time "09:00"))
 
 (setq inhibit-startup-message t)
 
@@ -65,8 +67,9 @@
 (column-number-mode)
 (global-display-line-numbers-mode t)
 
-(setq c-default-style "bsd"
-      c-basic-offset 4)
+(setq cmake-ts-mode-indent-offset 4)
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 2)
 
 ;; Disable line numbers for some modes
 (dolist (mode '(org-mode-hook
@@ -84,7 +87,6 @@
 (use-package ace-window
   :init (setq aw-scope 'global)
   :bind (("C-o" . ace-window)))
-
 
 (add-hook 'after-init-hook (lambda ()
   (when (fboundp 'auto-dim-other-buffers-mode)
@@ -104,10 +106,6 @@
 
 (ido-mode t)
 
-(use-package org-contrib
-  :ensure t)
-(require 'ox-confluence)
-
 (use-package helm
   :config
   (setq helm-split-window-inside-p t)
@@ -126,6 +124,9 @@
   ("M-y" . 'helm-show-kill-ring)  ;; Show kill ring, pick something to paste
   :ensure t)
 
+(use-package helm-projectile
+  :ensure t
+  :init)
 
 (use-package flycheck
   :ensure t
@@ -136,7 +137,9 @@
   :config
   (smartparens-global-mode 1))
 
-(use-package nerd-icons)
+(use-package nerd-icons
+  :custom
+  (nerd-icons-font-family "Symbols Nerd Font Mono"))
 
 (use-package doom-modeline
   :ensure t
@@ -184,18 +187,18 @@
          (c-mode . lsp-deferred)
 	 (c++-mode . lsp-deferred)
 	 (python-mode . lsp-deferred)
-	 (typescript-ts-mode . lsp-deferred)
-	 (tsx-ts-mode . lsp-deferred)
-	 (javascript-mode . lsp-deferred)
          ;; if you want which-key integration
-         (lsp-mode . lsp-enable-which-key-integration))
+         (lsp-mode . lsp-enable-which-key-integration)
+	 (lsp-mode . lsp-semantic-tokens-mode)
+	 ;; (cmake-ts-mode . lsp-deferred)
+	 )
   :commands lsp-deffered)
 
 (use-package helm-lsp
   :after helm
+  :commands helm-lsp-workspace-symbol
   :bind
-  (:map lsp-mode-map
-	([remap xref-find-apropos] . helm-lsp-workspace-symbol)))
+)
 
 (use-package lsp-treemacs
   :commands lsp-treemacs-errors-list
@@ -238,27 +241,31 @@
                                  company-gtags
                                  company-ispell)))
 
+(use-package yasnippet
+  :custom
+  (yas-global-mode 1))
+
 ;; (use-package company
 ;;   :commands company-mode
 ;;   :init
 ;;   (add-hook 'prog-mode-hook #'company-mode)
 ;;   (add-hook 'text-mode-hook #'company-mode))
-(use-package company-box
-  :after company
-  :diminish company-box-mode
-  :custom
-  (company-box-show-single-candidate t)
-  (company-box-frame-behavior 'point)
-  (company-box-icons-alist 'company-box-icons-all-the-icons)
-  (company-box-max-candidates 10)
-  (company-box-icon-right-margin 0.5)
-  :hook
-  (company-mode . company-box-mode))
+;; (use-package company-box
+;;   :after company
+;;   :diminish company-box-mode
+;;   :custom
+;;   (company-box-show-single-candidate t)
+;;   (company-box-frame-behavior 'point)
+;;   (company-box-icons-alist 'company-box-icons-all-the-icons)
+;;   (company-box-max-candidates 10)
+;;   (company-box-icon-right-margin 0.5)
+;;   :hook
+;;   (company-mode . company-box-mode))
 
-(use-package company-prescient
-  :after company
-  :config
-  (company-prescient-mode))
+;; (use-package company-prescient
+;;   :after company
+;;   :config
+;;   (company-prescient-mode))
 
 (use-package flyspell
   :diminish
@@ -274,9 +281,23 @@
    (flyspell-prog-mode . flyspell-popup-auto-correct-mode)))
 
 
+(use-package org-roam
+  :ensure t
+  :custom
+  (org-roam-directory "~/RoamNotes")
+  (org-roam-completion-everywhere t)
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n i" . org-roam-node-insert)
+	 ("C-c n g" . org-roam-graph))
+         ;; :map org-mode-map
+         ("C-M-i"    . completion-at-point)
+  :config
+  (org-roam-db-autosync-mode))
+
 (defun dw/org-mode-setup ()
   (org-indent-mode)
-  (variable-pitch-mode 1)
+  ;; (variable-pitch-mode 1)
   (auto-fill-mode 0)
   (visual-line-mode 1)
   )
@@ -319,31 +340,126 @@
 (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
 (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
 (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+(set-face-attribute 'default nil :height 110)
 
+;; (setq org-plantuml-jar-path (expand-file-name "/home/tortega/plantuml-1.2025.2.jar"))
+;; (setq plantuml-executable-path "/home/tortega/.nix-profile/bin/plantuml")
+;; (setq plantuml-default-exec-mode 'executable)
 
-(use-package org-roam
-  :ensure t
-  :init
-  (setq org-roam-v2-ack t)
-  :custom
-  (org-roam-directory "~/RoamNotes")
-  (org-roam-completion-everywhere t)
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . org-roam-node-find)
-         ("C-c n i" . org-roam-node-insert)
-	 ("C-c n g" . org-roam-graph)
-         :map org-mode-map
-         ("C-M-i"    . completion-at-point))
+(use-package plantuml-mode
+  :mode ("\\.plantuml\\'")
+  ;; :config
+  ;; (setopt plantuml-exec-mode 'executable)
+  ;; ;; (setopt plantuml-default-exec-mode plantuml-exec-mode)
+  ;; ;; (setopt plantuml-preview-theme "reddress-darkgreen")
+  ;; (setopt plantuml-executable-path "~/.nix-profile/bin/plantuml")
+  ;; (setopt org-plantuml-jar-path "~/.nix-profile/lib/plantuml.jar")
+  )
+
+(setq org-plantuml-jar-path (expand-file-name "~/.nix-profile/lib/plantuml.jar"))
+(setq plantuml-executable-path "/home/tortega/.nix-profile/bin/plantuml")
+(setq plantuml-default-exec-mode 'executable)
+
+(use-package ob-mermaid)
+(setq ob-mermaid-cli-path "/home/tortega/.nix-profile/bin/mmdc")
+(org-babel-do-load-languages
+    'org-babel-load-languages
+    '((mermaid . t)
+      (plantuml . t)
+      (scheme . t)))
+
+(eval-after-load "org"
+  '(require 'ox-gfm nil t))
+
+(add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
+
+(add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-ts-mode))
+
+(use-package hl-todo
   :config
-  (org-roam-setup))
+  (global-hl-todo-mode))
 
-;; (use-package vterm
-;;     :ensure t)
+(use-package flycheck-hl-todo
+  :ensure t
+  :defer 5 ; Need to be initialized after the rest of checkers
+  :config
+  (flycheck-hl-todo-setup))
 
-(use-package tree-sitter)
+(use-package magit-todos
+  :after magit
+  :config (magit-todos-mode 1))
+
+;; (use-package dap-mode
+;;   :config
+;;   (require 'dap-lldb)
+;;   (setq dap-lldb-debug-program '("~/LLVM-20.1.4-Linux-X64/bin/lldb-dap"))
+;;   (setq dap-auto-configure-features '(sessions locals controls tooltip)))
+
+;; ;; (setq dap-gdb-debug-program '("/usr/bin/gdb" "-i" "dap"))
+;; (setq dap-gdb-debug-program '("/bin/arm-none-eabi-gdb" "-i" "dap"))
+
+;; (require 'dap-gdb)
+
+
+
+(use-package caser
+  :bind (("M-C"   . caser-camelcase-dwim)
+	 ("C-M-C" . caser-upper-camelcase-dwim)
+	 ("M-S"   . caser-snakecase-dwim)
+	 ("M-D"   . caser-dashcase-dwim))
+  )
+
+(setq treesit-language-source-alist
+   '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+     (cmake "https://github.com/uyha/tree-sitter-cmake")
+     ;; (css "https://github.com/tree-sitter/tree-sitter-css")
+     ;; (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+     ;; (go "https://github.com/tree-sitter/tree-sitter-go")
+     ;; (html "https://github.com/tree-sitter/tree-sitter-html")
+     ;; (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+     ;; (json "https://github.com/tree-sitter/tree-sitter-json")
+     (make "https://github.com/alemuller/tree-sitter-make")
+     ;; (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+     ;; (python "https://github.com/tree-sitter/tree-sitter-python")
+     ;; (toml "https://github.com/tree-sitter/tree-sitter-toml")
+     ;; (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+     ;; (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+     ;; (yaml "https://github.com/ikatyang/tree-sitter-yaml"))
+   ))
+
 (use-package tree-sitter-langs)
 
-(add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
+(use-package dts-mode)
 
-(use-package scad-mode)
+(defun smarter-move-beginning-of-line (arg)
+  "Move point back to indentation of beginning of line.
+
+Move point to the first non-whitespace character on this line.
+If point is already there, move to the beginning of the line.
+Effectively toggle between the first non-whitespace character and
+the beginning of the line.
+
+If ARG is not nil or 1, move forward ARG - 1 lines first.  If
+point reaches the beginning or end of the buffer, stop there."
+  (interactive "^p")
+  (setq arg (or arg 1))
+
+  ;; Move lines first
+  (when (/= arg 1)
+    (let ((line-move-visual nil))
+      (forward-line (1- arg))))
+
+  (let ((orig-point (point)))
+    (back-to-indentation)
+    (when (= orig-point (point))
+      (move-beginning-of-line 1))))
+
+;; remap C-a to `smarter-move-beginning-of-line'
+(global-set-key [remap move-beginning-of-line]
+                'smarter-move-beginning-of-line)
+
+;; set global text scale
+;; (setq global-text-scale-adjust 5)
+
+
 ;;; init.el ends here
