@@ -139,7 +139,7 @@
 
 (use-package nerd-icons
   :custom
-  (nerd-icons-font-family "Symbols Nerd Font Mono"))
+  (nerd-icons-font-family "JetBrainsMono NF"))
 
 (use-package doom-modeline
   :ensure t
@@ -340,7 +340,7 @@
 (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
 (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
 (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
-(set-face-attribute 'default nil :height 110)
+(set-face-attribute 'default nil :height 105)
 
 ;; (setq org-plantuml-jar-path (expand-file-name "/home/tortega/plantuml-1.2025.2.jar"))
 ;; (setq plantuml-executable-path "/home/tortega/.nix-profile/bin/plantuml")
