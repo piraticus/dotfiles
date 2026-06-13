@@ -1,4 +1,5 @@
-@import url("./colors.css");
+/* @import url("./colors.css"); */
+@import url("./everforest-colors.css");
 
 * {
     border: none;
@@ -48,7 +49,7 @@ tooltip label {
     /* transition: all 200ms ease-in-out; */
     background: @background;
     padding: 0 20px;
-    border: 2px solid @purple
+    border: 2px solid @green
     /* border-bottom: 3px solid white; */
 }
 

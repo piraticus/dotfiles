@@ -142,6 +142,9 @@
      libreoffice
      kdePackages.kcalc
      emacs-everforest-theme
+     everforest-gtk-theme
+     kdePackages.knewstuff
+     nwg-look
   ];
 
   programs.steam = {
