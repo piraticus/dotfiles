@@ -11,7 +11,7 @@ stdenvNoCC.mkDerivation {
     owner = "theorytoe";
     repo = "everforest-emacs";
     rev = "ba61a881b5d57810eef76baae01c951d1e6c2ceb";
-    
+    hash = "sha256-p8D27i5EZp37QVi9IffJqXnnFxUaaAc9BfzIzrje66U=";
   };
 
   dontBuild = true;
@@ -20,9 +20,9 @@ stdenvNoCC.mkDerivation {
 
   installPhase = ''
                  runHook preInstall
-                 mkdir -p $out/share/themes
+                 mkdir -p $out/share/themes/emacs-everforest
 
-                 cp -r ./* $out/share/themes
+                 cp -r ./* $out/share/themes/emacs-everforest
 
                  runHook postInstall                      
   

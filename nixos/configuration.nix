@@ -5,7 +5,7 @@
 { config, pkgs, ... }:
 
  let
-
+   emacs-everforest-theme = pkgs.callPackage ./customPackages/emacs-everforest.nix {};
  in
 
 {
@@ -141,6 +141,7 @@
      meld
      libreoffice
      kdePackages.kcalc
+     emacs-everforest-theme
   ];
 
   programs.steam = {

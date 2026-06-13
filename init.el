@@ -52,8 +52,11 @@
 ;;   (auto-package-update-maybe)
 ;;   (auto-package-update-at-time "09:00"))
 
-(use-package dracula-theme)
-(load-theme 'dracula t)
+;; (use-package dracula-theme)
+;; (load-theme 'dracula t)
+
+(add-to-list 'custom-theme-load-path "/run/current-system/sw/share/themes/emacs-everforest/")
+(load-theme 'everforest-hard-dark t)
 
 (setq inhibit-startup-message t)
 
