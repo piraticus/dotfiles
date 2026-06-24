@@ -3,7 +3,7 @@
     // "layer": "top", // Waybar at top layer
     // "position": "bottom", // Waybar position (top|bottom|left|right)
     "height": 25, // Waybar height (to be removed for auto height)
-//    "width": 3400, // Waybar width
+    // "width": 3400, // Waybar width
     "margin-top": 10,
     "margin-left": 20,
     "margin-right": 20,
@@ -17,6 +17,8 @@
     ],
     "modules-right": [
         "pulseaudio",
+        "battery",
+        "bluetooth",
         "clock",
         "tray"
     ],
@@ -48,4 +50,26 @@
         },
         "on-click": "pavucontrol"
     },
+
+    "battery": {
+        "interval": 60,
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{capacity}% {icon}",
+        "format-icons": ["", "", "", "", ""],
+        "max-length": 25
+    },
+
+    "bluetooth": {
+    // "controller": "controller1", // specify the alias of the controller if there are more than 1 on the system
+       "format": " {status}",
+       "format-disabled": "", // an empty format will hide the module
+       "format-connected": "",
+       "tooltip-format": "{controller_alias}\t{controller_address}",
+       "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
+       "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
+       "on-click": "blueman-manager"
+    }
 }

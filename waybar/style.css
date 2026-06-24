@@ -68,6 +68,24 @@ tooltip label {
     color: @foreground;
 }
 
+#battery {
+    background-color: @background;
+    color: @foreground;
+    padding: 0 10px;
+}
+
+#bluetooth {
+    background-color: @background;
+    color: @foreground;
+    padding: 0 10px;
+}
+
+#tray {
+    background-color: @background;
+    color: @foreground;
+    padding: 0 10px;
+}
+
 #window {
     /* transition: all 250ms ease-in-out; */
     padding: 0 10px;

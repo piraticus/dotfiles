@@ -9,13 +9,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(caser company direnv doom-modeline dracula-theme dts-mode
-           flycheck-hl-todo flyspell-popup helm-lsp helm-projectile
-           llama lsp-treemacs lsp-ui magit magit-todos nix-mode
-           ob-mermaid org-bullets org-roam plantuml-mode
-           rainbow-delimiters smartparens tree-sitter
-           tree-sitter-langs which-key with-editor yaml-mode yasnippet)))
+ '(package-selected-packages nil))
 ;; (custom-set-faces
 ;;  ;; custom-set-faces was added by Custom.
 ;;  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -32,6 +26,11 @@
 			 ;; ("nongnu" . "https://elpa.nongnu.org/nongnu/")
                          ("elpa" . "https://elpa.gnu.org/packages/")))
 
+;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+;; ;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
+;; ;; and `package-pinned-packages`. Most users will not need or want to do this.
+;; ;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+;; (package-initialize)
 
 
 
@@ -75,7 +74,58 @@
 
 (setq cmake-ts-mode-indent-offset 4)
 (setq-default indent-tabs-mode nil)
-(setq-default tab-width 2)
+(setq-default tab-width 4)
+
+;; (setq c-basic-offset 4)
+;; (setq c-default-style "stroustrup")
+
+;; Make a non-standard key binding.  We can put this in
+;; c-mode-base-map because c-mode-map, c++-mode-map, and so on,
+;; inherit from it.
+(defun my-c-initialization-hook ()
+  (define-key c-mode-base-map "\C-m" 'c-context-line-break))
+(add-hook 'c-initialization-hook 'my-c-initialization-hook)
+
+;; offset customizations not in my-c-style
+;; This will take precedence over any setting of the syntactic symbol
+;; made by a style.
+(setq c-offsets-alist '((member-init-intro . ++)))
+
+;; Create my personal style.
+(defconst my-c-style
+  '((c-tab-always-indent        . t)
+    (c-comment-only-line-offset . 4)
+    (c-hanging-braces-alist     . ((substatement-open after)
+                                   (brace-list-open)))
+    (c-hanging-colons-alist     . ((member-init-intro before)
+                                   (inher-intro)
+                                   (case-label after)
+                                   (label after)
+                                   (access-label after)))
+    (c-cleanup-list             . (scope-operator
+                                   empty-defun-braces
+                                   defun-close-semi))
+    (c-offsets-alist            . ((arglist-close . c-lineup-arglist)
+                                   (substatement-open . 0)
+                                   (case-label        . 4)
+                                   (block-open        . 0)
+                                   (knr-argdecl-intro . -)))
+    (c-echo-syntactic-information-p . t))
+  "My C Programming Style")
+(c-add-style "PERSONAL" my-c-style)
+
+;; Customizations for all modes in CC Mode.
+(defun my-c-mode-common-hook ()
+  ;; set my personal style for the current buffer
+  (c-set-style "PERSONAL")
+  ;; other customizations
+  (setq tab-width 4
+        ;; this will make sure spaces are used instead of tabs
+        indent-tabs-mode nil)
+  ;; we like auto-newline, but not hungry-delete
+  (c-toggle-auto-newline -1)
+  (setq subword-mode t))
+(add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 
 ;; Disable line numbers for some modes
 (dolist (mode '(org-mode-hook
@@ -110,7 +160,9 @@
 (define-key function-key-map (kbd "<f5>") 'event-apply-super-modifier)
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 
-(ido-mode t)
+(setq ido-enable-flex-matching t)
+(setq ido-everywhere t)
+(ido-mode 1)
 
 (use-package helm
   :config
@@ -145,7 +197,7 @@
 
 (use-package nerd-icons
   :custom
-  (nerd-icons-font-family "JetBrainsMono NF"))
+  (nerd-icons-font-family "Symbols Nerd Font Mono"))
 
 (use-package doom-modeline
   :ensure t
@@ -251,28 +303,6 @@
   :custom
   (yas-global-mode 1))
 
-;; (use-package company
-;;   :commands company-mode
-;;   :init
-;;   (add-hook 'prog-mode-hook #'company-mode)
-;;   (add-hook 'text-mode-hook #'company-mode))
-;; (use-package company-box
-;;   :after company
-;;   :diminish company-box-mode
-;;   :custom
-;;   (company-box-show-single-candidate t)
-;;   (company-box-frame-behavior 'point)
-;;   (company-box-icons-alist 'company-box-icons-all-the-icons)
-;;   (company-box-max-candidates 10)
-;;   (company-box-icon-right-margin 0.5)
-;;   :hook
-;;   (company-mode . company-box-mode))
-
-;; (use-package company-prescient
-;;   :after company
-;;   :config
-;;   (company-prescient-mode))
-
 (use-package flyspell
   :diminish
   :hook
@@ -348,39 +378,6 @@
 (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
 (set-face-attribute 'default nil :height 105)
 
-;; (setq org-plantuml-jar-path (expand-file-name "/home/tortega/plantuml-1.2025.2.jar"))
-;; (setq plantuml-executable-path "/home/tortega/.nix-profile/bin/plantuml")
-;; (setq plantuml-default-exec-mode 'executable)
-
-(use-package plantuml-mode
-  :mode ("\\.plantuml\\'")
-  ;; :config
-  ;; (setopt plantuml-exec-mode 'executable)
-  ;; ;; (setopt plantuml-default-exec-mode plantuml-exec-mode)
-  ;; ;; (setopt plantuml-preview-theme "reddress-darkgreen")
-  ;; (setopt plantuml-executable-path "~/.nix-profile/bin/plantuml")
-  ;; (setopt org-plantuml-jar-path "~/.nix-profile/lib/plantuml.jar")
-  )
-
-(setq org-plantuml-jar-path (expand-file-name "~/.nix-profile/lib/plantuml.jar"))
-(setq plantuml-executable-path "/home/tortega/.nix-profile/bin/plantuml")
-(setq plantuml-default-exec-mode 'executable)
-
-(use-package ob-mermaid)
-(setq ob-mermaid-cli-path "/home/tortega/.nix-profile/bin/mmdc")
-(org-babel-do-load-languages
-    'org-babel-load-languages
-    '((mermaid . t)
-      (plantuml . t)
-      (scheme . t)))
-
-(eval-after-load "org"
-  '(require 'ox-gfm nil t))
-
-(add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
-
-(add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-ts-mode))
-
 (use-package hl-todo
   :config
   (global-hl-todo-mode))
@@ -394,19 +391,6 @@
 (use-package magit-todos
   :after magit
   :config (magit-todos-mode 1))
-
-;; (use-package dap-mode
-;;   :config
-;;   (require 'dap-lldb)
-;;   (setq dap-lldb-debug-program '("~/LLVM-20.1.4-Linux-X64/bin/lldb-dap"))
-;;   (setq dap-auto-configure-features '(sessions locals controls tooltip)))
-
-;; ;; (setq dap-gdb-debug-program '("/usr/bin/gdb" "-i" "dap"))
-;; (setq dap-gdb-debug-program '("/bin/arm-none-eabi-gdb" "-i" "dap"))
-
-;; (require 'dap-gdb)
-
-
 
 (use-package caser
   :bind (("M-C"   . caser-camelcase-dwim)
@@ -464,8 +448,28 @@ point reaches the beginning or end of the buffer, stop there."
 (global-set-key [remap move-beginning-of-line]
                 'smarter-move-beginning-of-line)
 
-;; set global text scale
-;; (setq global-text-scale-adjust 5)
 
 
+(use-package multiple-cursors
+  :bind(
+        ("C-s-c C-s-c" . mc/edit-lines)
+        ("C->" . mc/mark-next-like-this)
+        ("C-<" . mc/mark-previous-like-this)
+        ("C-c C-<" . mc/mark-all-like-this)
+        )
+  )
+
+(use-package ob-mermaid)
+(org-babel-do-load-languages
+    'org-babel-load-languages
+    '((mermaid . t)
+      (scheme . t)
+      ))
+(setq ob-mermaid-cli-path "mmdc")
 ;;; init.el ends here
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
