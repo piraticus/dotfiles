@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
  let
    emacs-everforest-theme = pkgs.callPackage ./customPackages/emacs-everforest.nix {};
@@ -49,15 +49,15 @@
   hardware.nvidia.powerManagement.enable = true; # For NVIDIA GPUs
   
   hardware.graphics.enable = true;
-  services.xserver.videoDrivers = [ "nvidia" ];
-  hardware.nvidia.open = false;
+  services.xserver.videoDrivers = [ "modesetting" ];
+  # hardware.nvidia.open = false;
   
-  hardware.nvidia.modesetting.enable = true;
-  hardware.nvidia.prime = {
-    sync.enable = true;
-    intelBusId = "PCI:0@0:2:0";
-    nvidiaBusId = "PCI:1@0:0:0";
-  };
+  # hardware.nvidia.modesetting.enable = true;
+  # hardware.nvidia.prime = {
+  #   sync.enable = true;
+  #   intelBusId = "PCI:0@0:2:0";
+  #   nvidiaBusId = "PCI:1@0:0:0";
+  # };
 
   programs.hyprland.enable = true;
 
@@ -96,6 +96,15 @@
     packages = with pkgs; [
     #  thunderbird
     ];
+  };
+
+  programs.bash = {
+    shellAliases = {
+      ll = "ls -la";
+      rf = "rm -rf";
+      rebuild = "sudo nixos-rebuild switch --flake ~/.config/nixos --impure";
+    };
+
   };
 
   nix.settings.trusted-users = ["root" "tony"];
@@ -150,6 +159,10 @@
      pavucontrol
      brightnessctl
      calibre
+     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
+     python3Packages.oscrypto
+
+     discord
   ];
 
   programs.steam = {

@@ -8,9 +8,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    zen-browser = {
+      url = "github:youwen5/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
 
-  outputs = inputs@{nixpkgs, determinate, ...}:
+  outputs = inputs@{nixpkgs, determinate, zen-browser, ...}:
     let
       username = "tony";
       hostname = "nixos";
